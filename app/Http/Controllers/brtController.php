@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Brt;
+use App\Events\BrtCreated;
+use App\Events\BrtDeleted;
+use App\Events\BrtUpdated;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Pusher\Pusher;
 
 class brtController extends Controller
 {
@@ -31,6 +35,7 @@ class brtController extends Controller
         $brt->brt_code = (string)Str::uuid();
 
         $brt->save();
+        event(new BrtCreated($brt));
 
         return response()->json($brt, 201);
     }
@@ -61,6 +66,7 @@ class brtController extends Controller
         if (isset($request->status)) $brt->status = $request->status;
 
         $brt->save();
+        event(new BrtUpdated($brt));
 
         return response()->json($brt);
     }
@@ -75,7 +81,9 @@ class brtController extends Controller
 
         if (!$brt) return response()->json(['message' => 'record not found'], 404);
 
+        $ibrt = $brt->toJson();
         $brt->delete();
+        event(new BrtDeleted($ibrt));
 
         return response()->json(['message' => 'BRT Record Deleted Successfully']);
     }

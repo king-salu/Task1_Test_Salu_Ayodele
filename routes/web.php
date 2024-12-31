@@ -24,3 +24,7 @@ Route::get('/data_analysis', function (Request $request) {
     $result = $brtController->data_analysis($request);
     return view('analysis', ['result' => $result, 'startdate' => $request->startdate, 'enddate' => $request->enddate]);
 });
+
+Route::get('/notification', function () {
+    return view('notification');
+});
